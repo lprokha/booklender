@@ -1,0 +1,17 @@
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+.bg-orange {
+  background-color: #ff7a00 !important;
+}
+
+.book-cover {
+  height: 220px;
+  object-fit: cover;
+}
+
+.book-cover-big {
+  height: 420px;
+  object-fit: cover;
+}

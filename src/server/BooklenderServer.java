@@ -28,6 +28,7 @@ public class BooklenderServer extends BasicServer {
         registerGet("/", this::handleBooks);
         registerGet("/books", this::handleBooks);
         registerGet("/book", this::handleBook);
+        registerGet("/employee", this::handleEmployee);
     }
 
     private static Configuration initFreeMarker() {
@@ -76,5 +77,14 @@ public class BooklenderServer extends BasicServer {
         model.put("book", book);
 
         renderTemplate(exchange, "book.ftl", model);
+    }
+
+    private void handleEmployee(HttpExchange exchange) {
+        var employee = fakeData.getEmployee();
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("employee", employee);
+
+        renderTemplate(exchange, "employee.ftl", model);
     }
 }

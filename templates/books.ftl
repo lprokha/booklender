@@ -105,7 +105,7 @@
     <footer class="footer bg-dark">
       <div class="container-xxl py-4">
         <div class="text-white text-opacity-50 small">
-          Учебный проект — FreeMarker + HttpServer
+          2026 Booklender
         </div>
       </div>
     </footer>

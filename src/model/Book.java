@@ -6,6 +6,7 @@ public class Book {
     private String author;
     private String imagePath;
     private String issuedToName;
+    private boolean status;
 
     public Book(int id, String title, String author, String imagePath, String issuedToName, boolean status) {
         this.id = id;

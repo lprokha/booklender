@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "fullName": "Иван Иванов",
+    "currentBooks": [],
+    "pastBooks": [],
+    "email": "ivan@example.com"
+  },
+  {
+    "id": 2,
+    "fullName": "Лейла",
+    "currentBooks": [],
+    "pastBooks": [],
+    "email": "qwe@qwe.qwe"
+  }
+]

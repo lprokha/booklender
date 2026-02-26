@@ -50,6 +50,15 @@
               <li class="nav-item mx-lg-3">
                 <a class="nav-link active" href="/employee">Сотрудник</a>
               </li>
+              <li class="nav-item mx-lg-3">
+                <a class="nav-link active" href="/register">Регистрация</a>
+              </li>
+              <li class="nav-item mx-lg-3">
+                <a class="nav-link active" href="/login">Вход</a>
+              </li>
+              <li class="nav-item mx-lg-3">
+                <a class="nav-link active" href="/profile">Профиль</a>
+              </li>
             </ul>
           </div>
         </div>

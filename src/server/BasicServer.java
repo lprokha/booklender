@@ -87,8 +87,7 @@ public abstract class BasicServer {
     protected void redirect303(HttpExchange exchange, String path) {
         try {
             exchange.getResponseHeaders().add("Location", path);
-            exchange.sendResponseHeaders(303, 0);
-            exchange.getResponseBody().close();
+            exchange.sendResponseHeaders(ResponseCodes.SEE_OTHER.getCode(), 0);            exchange.getResponseBody().close();
         } catch (IOException e) {
             e.printStackTrace();
         }

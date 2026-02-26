@@ -185,9 +185,6 @@ public class BooklenderServer extends BasicServer {
         renderTemplate(exchange, "profile.ftl", model);
     }
 
-
-
-
     private void handleBooks(HttpExchange exchange) {
         List<Book> books = bookStorage.getBooks();
 

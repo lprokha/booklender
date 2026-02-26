@@ -8,12 +8,16 @@ public class Book {
     private String issuedToName;
     private boolean status;
 
+    public Book() {
+    }
+
     public Book(int id, String title, String author, String imagePath, String issuedToName, boolean status) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.imagePath = imagePath;
         this.issuedToName = issuedToName;
+        this.status = status;
     }
 
     public String getTitle() {

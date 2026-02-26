@@ -1,0 +1,38 @@
+[
+  {
+    "id": 1,
+    "title": "Clean Code",
+    "author": "Robert C. Martin",
+    "imagePath": "/img/clean-code.jpg",
+    "issuedToName": null,
+    "issuedToEmployeeId": null,
+    "status": false
+  },
+  {
+    "id": 2,
+    "title": "Effective Java",
+    "author": "Joshua Bloch",
+    "imagePath": "/img/java.jpg",
+    "issuedToName": "Айбек Ибраимов",
+    "issuedToEmployeeId": 2,
+    "status": true
+  },
+  {
+    "id": 3,
+    "title": "Design Patterns",
+    "author": "GoF",
+    "imagePath": "/img/patterns.jpg",
+    "issuedToName": null,
+    "issuedToEmployeeId": null,
+    "status": false
+  },
+  {
+    "id": 4,
+    "title": "Refactoring",
+    "author": "Martin Fowler",
+    "imagePath": "/img/refactoring.jpg",
+    "issuedToName": "Лейла",
+    "issuedToEmployeeId": 1,
+    "status": true
+  }
+]

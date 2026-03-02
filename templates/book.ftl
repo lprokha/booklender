@@ -70,7 +70,6 @@
 
     <main class="bg-light">
       <div class="container-xxl py-5">
-
         <a href="/books" class="btn btn-outline-secondary mb-4">
           <i class="bi bi-arrow-left me-2"></i>Назад к списку
         </a>
@@ -90,22 +89,48 @@
                 <h1 class="fw-semibold mb-2">${book.title}</h1>
                 <p class="text-muted mb-3">Автор: ${book.author}</p>
 
+                <#-- Книга выдана -->
                 <#if book.issuedToName??>
                   <div class="alert alert-warning mb-0">
                     <i class="bi bi-person-check me-2"></i>
                     Книга выдана: <strong>${book.issuedToName}</strong>
                   </div>
+
+                  <#-- Кнопка "Вернуть" только если это моя книга -->
+                  <#if canReturn?? && canReturn>
+                    <form method="post" action="/book/return" class="mt-3">
+                      <button type="submit" class="btn btn-outline-danger">
+                        <i class="bi bi-arrow-counterclockwise me-2"></i>Вернуть книгу
+                      </button>
+                    </form>
+                  </#if>
+
+                <#-- Книга свободна -->
                 <#else>
                   <div class="alert alert-success mb-0">
                     <i class="bi bi-check2 me-2"></i>
                     Книга свободна
                   </div>
+
+                  <#-- Взять книгу можно только после авторизации -->
+                  <#if isAuth?? && isAuth>
+                    <form method="post" action="/book/issue" class="mt-3">
+                      <button type="submit" class="btn btn-success">
+                        <i class="bi bi-bookmark-plus me-2"></i>Взять книгу
+                      </button>
+                    </form>
+                  <#else>
+                    <div class="mt-3">
+                      <a class="btn btn-outline-primary" href="/login">
+                        Войти, чтобы взять книгу
+                      </a>
+                    </div>
+                  </#if>
                 </#if>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </main>
 

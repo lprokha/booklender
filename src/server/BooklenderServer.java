@@ -38,6 +38,11 @@ public class BooklenderServer extends BasicServer {
     private boolean hasCurrentUser = false;
     private String currentUserEmail = "";
 
+    private static final String SESSION_COOKIE = "sessionId";
+    private static final int SESSION_MAX_AGE_SECONDS = 600;
+
+    private final Map<String, String> sessions = new HashMap<>();
+
     public BooklenderServer(String host, int port) throws IOException {
         super(host, port);
 
@@ -85,6 +90,24 @@ public class BooklenderServer extends BasicServer {
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
         }
+    }
+
+    private String newSessionId() {
+        return java.util.UUID.randomUUID().toString();
+    }
+
+    private User getCurrentUser(HttpExchange exchange) {
+        String sessionId = getCookieValue(exchange, SESSION_COOKIE);
+        if (sessionId == null || sessionId.isBlank()) {
+            return null;
+        }
+
+        String email = sessions.get(sessionId);
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+
+        return userStorage.findByEmail(email);
     }
 
     private void registerGet(HttpExchange exchange) {
@@ -157,8 +180,13 @@ public class BooklenderServer extends BasicServer {
             return;
         }
 
-        hasCurrentUser = true;
-        currentUserEmail = user.getEmail();
+        String sessionId = newSessionId();
+        sessions.put(sessionId, user.getEmail());
+
+        Cookie cookie = Cookie.make(SESSION_COOKIE, sessionId);
+        cookie.setMaxAge(SESSION_MAX_AGE_SECONDS);
+        cookie.setHttpOnly(true);
+        setCookie(exchange, cookie);
 
         redirect303(exchange, "/profile");
     }

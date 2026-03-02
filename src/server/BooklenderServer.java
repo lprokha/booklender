@@ -35,9 +35,6 @@ public class BooklenderServer extends BasicServer {
 
     private boolean loginFlashError = false;
 
-    private boolean hasCurrentUser = false;
-    private String currentUserEmail = "";
-
     private static final String SESSION_COOKIE = "sessionId";
     private static final int SESSION_MAX_AGE_SECONDS = 600;
 
@@ -194,16 +191,14 @@ public class BooklenderServer extends BasicServer {
     private void profileGet(HttpExchange exchange) {
         Map<String, Object> model = new HashMap<>();
 
-        if (hasCurrentUser && !currentUserEmail.isBlank()) {
-            User user = userStorage.findByEmail(currentUserEmail);
-            if (user != null) {
-                model.put("isReal", true);
-                model.put("email", user.getEmail());
-                model.put("fullName", user.getFullName());
+        User user = getCurrentUser(exchange);
+        if (user != null) {
+            model.put("isReal", true);
+            model.put("email", user.getEmail());
+            model.put("fullName", user.getFullName());
 
-                renderTemplate(exchange, "profile.ftl", model);
-                return;
-            }
+            renderTemplate(exchange, "profile.ftl", model);
+            return;
         }
 
         model.put("isReal", false);

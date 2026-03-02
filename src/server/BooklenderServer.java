@@ -57,6 +57,102 @@ public class BooklenderServer extends BasicServer {
         registerPost("/login", this::loginPost);
 
         registerGet("/profile", this::profileGet);
+
+        registerPost("/book/issue", this::issueBookPost);
+        registerPost("/book/return", this::returnBookPost);
+    }
+
+    private void returnBookPost(HttpExchange exchange) {
+        Employee employee = getCurrentEmployee(exchange);
+        if (employee == null) {
+            redirect303(exchange, "/login");
+            return;
+        }
+
+        List<Book> books = bookStorage.getBooks();
+        Book book = books.isEmpty() ? null : books.get(0);
+        if (book == null) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        if (book.getIssuedToEmail() == null ||
+                !book.getIssuedToEmail().equalsIgnoreCase(employee.getEmail())) {
+            redirect303(exchange, "/book");
+            return;
+        }
+
+        if (employee.getCurrentBooks() != null) {
+            employee.getCurrentBooks().removeIf(b -> b.getId() == book.getId());
+        }
+        if (employee.getPastBooks() != null) {
+            employee.getPastBooks().add(book);
+        }
+
+        book.setIssuedToEmail(null);
+        book.setIssuedToName(null);
+        book.setStatus(false);
+
+        bookStorage.saveBooks(books);
+
+        List<Employee> employees = employeeStorage.getEmployees();
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getEmail() != null &&
+                    employees.get(i).getEmail().equalsIgnoreCase(employee.getEmail())) {
+                employees.set(i, employee);
+                break;
+            }
+        }
+        employeeStorage.saveEmployees(employees);
+
+        redirect303(exchange, "/book");
+    }
+
+    private void issueBookPost(HttpExchange exchange) {
+        Employee employee = getCurrentEmployee(exchange);
+        if (employee == null) {
+            redirect303(exchange, "/login");
+            return;
+        }
+
+        if (employee.getCurrentBooks() != null && employee.getCurrentBooks().size() >= 2) {
+            redirect303(exchange, "/profile");
+            return;
+        }
+
+        List<Book> books = bookStorage.getBooks();
+        Book book = books.isEmpty() ? null : books.get(0);
+        if (book == null) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        if (book.getIssuedToEmail() != null && !book.getIssuedToEmail().isBlank()) {
+            redirect303(exchange, "/book");
+            return;
+        }
+
+        book.setIssuedToEmail(employee.getEmail());
+        book.setIssuedToName(employee.getFullName());
+        book.setStatus(true);
+
+        if (employee.getCurrentBooks() != null) {
+            employee.getCurrentBooks().add(book);
+        }
+
+        bookStorage.saveBooks(books);
+
+        List<Employee> employees = employeeStorage.getEmployees();
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getEmail() != null &&
+                    employees.get(i).getEmail().equalsIgnoreCase(employee.getEmail())) {
+                employees.set(i, employee);
+                break;
+            }
+        }
+        employeeStorage.saveEmployees(employees);
+
+        redirect303(exchange, "/book");
     }
 
     private static Configuration initFreeMarker() {
@@ -105,6 +201,20 @@ public class BooklenderServer extends BasicServer {
         }
 
         return userStorage.findByEmail(email);
+    }
+
+    private Employee getCurrentEmployee(HttpExchange exchange) {
+        User user = getCurrentUser(exchange);
+        if (user == null) return null;
+        return employeeStorage.findByEmail(user.getEmail());
+    }
+
+    private Book firstBookOrNull(List<Book> books) {
+        if (books.isEmpty()) {
+            return null;
+        }
+
+        return books.get(0);
     }
 
     private void registerGet(HttpExchange exchange) {
@@ -223,6 +333,14 @@ public class BooklenderServer extends BasicServer {
 
         Map<String, Object> model = new HashMap<>();
         model.put("book", book);
+        model.put("isAuth", getCurrentUser(exchange) != null);
+
+        User user = getCurrentUser(exchange);
+        boolean canReturn = false;
+        if (user != null && book != null && book.getIssuedToEmail() != null) {
+            canReturn = book.getIssuedToEmail().equalsIgnoreCase(user.getEmail());
+        }
+        model.put("canReturn", canReturn);
 
         renderTemplate(exchange, "book.ftl", model);
     }

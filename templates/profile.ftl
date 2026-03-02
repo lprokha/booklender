@@ -62,10 +62,19 @@
       </a>
     </div>
 
+    <#-- Если пользователь реально авторизован -->
     <#if isReal?? && isReal>
       <div class="alert alert-success">
         <i class="bi bi-check2 me-2"></i>Успешный вход
       </div>
+
+      <form method="post" action="/logout" class="mb-4">
+        <button class="btn btn-outline-danger" type="submit">
+          <i class="bi bi-box-arrow-right me-2"></i>Выйти
+        </button>
+      </form>
+
+    <#-- Если страница открыта напрямую -->
     <#else>
       <div class="alert alert-warning">
         <i class="bi bi-info-circle me-2"></i>
@@ -75,8 +84,14 @@
 
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
-        <div class="mb-2"><span class="text-muted">Email:</span> <strong>${email}</strong></div>
-        <div><span class="text-muted">Имя:</span> <strong>${fullName}</strong></div>
+        <div class="mb-2">
+          <span class="text-muted">Email:</span>
+          <strong>${email}</strong>
+        </div>
+        <div>
+          <span class="text-muted">Имя:</span>
+          <strong>${fullName}</strong>
+        </div>
       </div>
     </div>
 

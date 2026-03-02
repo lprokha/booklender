@@ -25,14 +25,17 @@ public class Utils {
     }
 
     static Optional<Map.Entry<String, String>> decode(String kv) {
-        if (kv == null || !kv.contains("=")) return Optional.empty();
+        if (kv == null) return Optional.empty();
+
+        kv = kv.strip();
+
+        if (!kv.contains("=")) return Optional.empty();
 
         String[] pair = kv.split("=", 2);
         if (pair.length != 2) return Optional.empty();
 
-        String key = URLDecoder.decode(pair[0], StandardCharsets.UTF_8);
-        String value = URLDecoder.decode(pair[1], StandardCharsets.UTF_8);
-
+        String key = URLDecoder.decode(pair[0].strip(), StandardCharsets.UTF_8);
+        String value = URLDecoder.decode(pair[1].strip(), StandardCharsets.UTF_8);
         return Optional.of(Map.entry(key, value));
     }
 }

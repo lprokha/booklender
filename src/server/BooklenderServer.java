@@ -35,8 +35,10 @@ public class BooklenderServer extends BasicServer {
 
     private boolean loginFlashError = false;
 
-    private boolean hasCurrentUser = false;
-    private String currentUserEmail = "";
+    private static final String SESSION_COOKIE = "sessionId";
+    private static final int SESSION_MAX_AGE_SECONDS = 600;
+
+    private final Map<String, String> sessions = new HashMap<>();
 
     public BooklenderServer(String host, int port) throws IOException {
         super(host, port);
@@ -55,6 +57,118 @@ public class BooklenderServer extends BasicServer {
         registerPost("/login", this::loginPost);
 
         registerGet("/profile", this::profileGet);
+
+        registerPost("/book/issue", this::issueBookPost);
+        registerPost("/book/return", this::returnBookPost);
+        
+        registerPost("/logout", this::logoutPost);
+    }
+
+    private void logoutPost(HttpExchange exchange) {
+        String sessionId = getCookieValue(exchange, SESSION_COOKIE);
+        if (sessionId != null) {
+            sessions.remove(sessionId);
+        }
+
+        Cookie<String> dead = Cookie.make(SESSION_COOKIE, "");
+        dead.setMaxAge(0);
+        dead.setHttpOnly(true);
+        setCookie(exchange, dead);
+
+        redirect303(exchange, "/login");
+    }
+
+    private void returnBookPost(HttpExchange exchange) {
+        Employee employee = getCurrentEmployee(exchange);
+        if (employee == null) {
+            redirect303(exchange, "/login");
+            return;
+        }
+
+        List<Book> books = bookStorage.getBooks();
+        Book book = firstBookOrNull(books);
+        if (book == null) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        if (book.getIssuedToEmail() == null ||
+                !book.getIssuedToEmail().equalsIgnoreCase(employee.getEmail())) {
+            redirect303(exchange, "/book");
+            return;
+        }
+
+        if (employee.getCurrentBooks() != null) {
+            employee.getCurrentBooks().removeIf(b -> b.getId() == book.getId());
+        }
+        if (employee.getPastBooks() != null) {
+            employee.getPastBooks().add(book);
+        }
+
+        book.setIssuedToEmail(null);
+        book.setIssuedToName(null);
+        book.setStatus(false);
+
+        bookStorage.saveBooks(books);
+
+        List<Employee> employees = employeeStorage.getEmployees();
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getEmail() != null &&
+                    employees.get(i).getEmail().equalsIgnoreCase(employee.getEmail())) {
+                employees.set(i, employee);
+                break;
+            }
+        }
+        employeeStorage.saveEmployees(employees);
+
+        redirect303(exchange, "/book");
+    }
+
+    private void issueBookPost(HttpExchange exchange) {
+        Employee employee = getCurrentEmployee(exchange);
+        if (employee == null) {
+            redirect303(exchange, "/login");
+            return;
+        }
+
+        if (employee.getCurrentBooks() != null && employee.getCurrentBooks().size() >= 2) {
+            redirect303(exchange, "/profile");
+            return;
+        }
+
+        List<Book> books = bookStorage.getBooks();
+        Book book = firstBookOrNull(books);
+        if (book == null) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        if (book.getIssuedToEmail() != null && !book.getIssuedToEmail().isBlank()) {
+            redirect303(exchange, "/book");
+            return;
+        }
+
+        book.setIssuedToEmail(employee.getEmail());
+        book.setIssuedToName(employee.getFullName());
+        book.setStatus(true);
+
+        if (employee.getCurrentBooks() != null) {
+            employee.getCurrentBooks().add(book);
+        }
+
+        bookStorage.saveBooks(books);
+
+        List<Employee> employees = employeeStorage.getEmployees();
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getEmail() != null &&
+                    employees.get(i).getEmail().equalsIgnoreCase(employee.getEmail())) {
+                employees.set(i, employee);
+                break;
+            }
+        }
+        employeeStorage.saveEmployees(employees);
+
+        redirect303(exchange, "/book");
     }
 
     private static Configuration initFreeMarker() {
@@ -85,6 +199,38 @@ public class BooklenderServer extends BasicServer {
         } catch (IOException | TemplateException e) {
             e.printStackTrace();
         }
+    }
+
+    private String newSessionId() {
+        return java.util.UUID.randomUUID().toString();
+    }
+
+    private User getCurrentUser(HttpExchange exchange) {
+        String sessionId = getCookieValue(exchange, SESSION_COOKIE);
+        if (sessionId == null || sessionId.isBlank()) {
+            return null;
+        }
+
+        String email = sessions.get(sessionId);
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+
+        return userStorage.findByEmail(email);
+    }
+
+    private Employee getCurrentEmployee(HttpExchange exchange) {
+        User user = getCurrentUser(exchange);
+        if (user == null) return null;
+        return employeeStorage.findByEmail(user.getEmail());
+    }
+
+    private Book firstBookOrNull(List<Book> books) {
+        if (books.isEmpty()) {
+            return null;
+        }
+
+        return books.get(0);
     }
 
     private void registerGet(HttpExchange exchange) {
@@ -157,8 +303,13 @@ public class BooklenderServer extends BasicServer {
             return;
         }
 
-        hasCurrentUser = true;
-        currentUserEmail = user.getEmail();
+        String sessionId = newSessionId();
+        sessions.put(sessionId, user.getEmail());
+
+        Cookie cookie = Cookie.make(SESSION_COOKIE, sessionId);
+        cookie.setMaxAge(SESSION_MAX_AGE_SECONDS);
+        cookie.setHttpOnly(true);
+        setCookie(exchange, cookie);
 
         redirect303(exchange, "/profile");
     }
@@ -166,16 +317,31 @@ public class BooklenderServer extends BasicServer {
     private void profileGet(HttpExchange exchange) {
         Map<String, Object> model = new HashMap<>();
 
-        if (hasCurrentUser && !currentUserEmail.isBlank()) {
-            User user = userStorage.findByEmail(currentUserEmail);
-            if (user != null) {
-                model.put("isReal", true);
-                model.put("email", user.getEmail());
-                model.put("fullName", user.getFullName());
+        User user = getCurrentUser(exchange);
 
-                renderTemplate(exchange, "profile.ftl", model);
-                return;
+        if (user != null) {
+            model.put("isReal", true);
+            model.put("email", user.getEmail());
+            model.put("fullName", user.getFullName());
+
+            Employee e = employeeStorage.findByEmail(user.getEmail());
+            if (e != null) {
+                model.put("currentBooks", e.getCurrentBooks());
+                model.put("pastBooks", e.getPastBooks());
+
+                if (e.getCurrentBooks() != null) {
+                    model.put("left", 2 - e.getCurrentBooks().size());
+                } else {
+                    model.put("left", 2);
+                }
+            } else {
+                model.put("currentBooks", List.of());
+                model.put("pastBooks", List.of());
+                model.put("left", 2);
             }
+
+            renderTemplate(exchange, "profile.ftl", model);
+            return;
         }
 
         model.put("isReal", false);
@@ -196,10 +362,25 @@ public class BooklenderServer extends BasicServer {
 
     private void handleBook(HttpExchange exchange) {
         List<Book> books = bookStorage.getBooks();
-        Book book = books.isEmpty() ? null : books.get(0);
+        Book book = firstBookOrNull(books);
 
         Map<String, Object> model = new HashMap<>();
         model.put("book", book);
+
+        User user = getCurrentUser(exchange);
+        if (user != null) {
+            model.put("isAuth", true);
+        } else {
+            model.put("isAuth", false);
+        }
+
+        boolean canReturn = false;
+        if (user != null && book != null && book.getIssuedToEmail() != null) {
+            if (book.getIssuedToEmail().equalsIgnoreCase(user.getEmail())) {
+                canReturn = true;
+            }
+        }
+        model.put("canReturn", canReturn);
 
         renderTemplate(exchange, "book.ftl", model);
     }

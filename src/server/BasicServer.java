@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -91,6 +92,21 @@ public abstract class BasicServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    protected String getCookies(HttpExchange exchange) {
+        return exchange.getRequestHeaders()
+                .getOrDefault("Cookie", List.of(""))
+                .get(0);
+    }
+
+    protected void setCookie(HttpExchange exchange, Cookie cookie) {
+        exchange.getResponseHeaders().add("Set-Cookie", cookie.toString());
+    }
+
+    protected String getCookieValue(HttpExchange exchange, String name) {
+        String cookieString = getCookies(exchange);
+        return Cookie.parse(cookieString).get(name);
     }
 
     protected final void registerFileHandler(String fileExt, ContentType type) {

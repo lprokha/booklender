@@ -10,7 +10,29 @@
     "id": 2,
     "fullName": "Лейла",
     "currentBooks": [],
-    "pastBooks": [],
+    "pastBooks": [
+      {
+        "id": 1,
+        "title": "Clean Code",
+        "author": "Robert C. Martin",
+        "imagePath": "/img/clean-code.jpg",
+        "status": false
+      },
+      {
+        "id": 1,
+        "title": "Clean Code",
+        "author": "Robert C. Martin",
+        "imagePath": "/img/clean-code.jpg",
+        "status": false
+      },
+      {
+        "id": 1,
+        "title": "Clean Code",
+        "author": "Robert C. Martin",
+        "imagePath": "/img/clean-code.jpg",
+        "status": false
+      }
+    ],
     "email": "qwe@qwe.qwe"
   }
 ]

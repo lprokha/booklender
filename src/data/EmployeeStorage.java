@@ -21,6 +21,13 @@ public class EmployeeStorage {
         storage.saveAll(employees);
     }
 
+    public Employee findByEmail(String email) {
+        return getEmployees().stream()
+                .filter(e -> e.getEmail().equalsIgnoreCase(email))
+                .findFirst()
+                .orElse(null);
+    }
+
     public boolean existsByEmail(String email) {
         return getEmployees().stream()
                 .anyMatch(e -> e.getEmail() != null && e.getEmail().equalsIgnoreCase(email));

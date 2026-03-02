@@ -60,6 +60,22 @@ public class BooklenderServer extends BasicServer {
 
         registerPost("/book/issue", this::issueBookPost);
         registerPost("/book/return", this::returnBookPost);
+        
+        registerPost("/logout", this::logoutPost);
+    }
+
+    private void logoutPost(HttpExchange exchange) {
+        String sessionId = getCookieValue(exchange, SESSION_COOKIE);
+        if (sessionId != null) {
+            sessions.remove(sessionId);
+        }
+
+        Cookie<String> dead = Cookie.make(SESSION_COOKIE, "");
+        dead.setMaxAge(0);
+        dead.setHttpOnly(true);
+        setCookie(exchange, dead);
+
+        redirect303(exchange, "/login");
     }
 
     private void returnBookPost(HttpExchange exchange) {

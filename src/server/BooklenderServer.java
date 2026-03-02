@@ -86,7 +86,7 @@ public class BooklenderServer extends BasicServer {
         }
 
         List<Book> books = bookStorage.getBooks();
-        Book book = books.isEmpty() ? null : books.get(0);
+        Book book = firstBookOrNull(books);
         if (book == null) {
             redirect303(exchange, "/books");
             return;
@@ -137,7 +137,7 @@ public class BooklenderServer extends BasicServer {
         }
 
         List<Book> books = bookStorage.getBooks();
-        Book book = books.isEmpty() ? null : books.get(0);
+        Book book = firstBookOrNull(books);
         if (book == null) {
             redirect303(exchange, "/books");
             return;
@@ -318,10 +318,27 @@ public class BooklenderServer extends BasicServer {
         Map<String, Object> model = new HashMap<>();
 
         User user = getCurrentUser(exchange);
+
         if (user != null) {
             model.put("isReal", true);
             model.put("email", user.getEmail());
             model.put("fullName", user.getFullName());
+
+            Employee e = employeeStorage.findByEmail(user.getEmail());
+            if (e != null) {
+                model.put("currentBooks", e.getCurrentBooks());
+                model.put("pastBooks", e.getPastBooks());
+
+                if (e.getCurrentBooks() != null) {
+                    model.put("left", 2 - e.getCurrentBooks().size());
+                } else {
+                    model.put("left", 2);
+                }
+            } else {
+                model.put("currentBooks", List.of());
+                model.put("pastBooks", List.of());
+                model.put("left", 2);
+            }
 
             renderTemplate(exchange, "profile.ftl", model);
             return;
@@ -345,16 +362,23 @@ public class BooklenderServer extends BasicServer {
 
     private void handleBook(HttpExchange exchange) {
         List<Book> books = bookStorage.getBooks();
-        Book book = books.isEmpty() ? null : books.get(0);
+        Book book = firstBookOrNull(books);
 
         Map<String, Object> model = new HashMap<>();
         model.put("book", book);
-        model.put("isAuth", getCurrentUser(exchange) != null);
 
         User user = getCurrentUser(exchange);
+        if (user != null) {
+            model.put("isAuth", true);
+        } else {
+            model.put("isAuth", false);
+        }
+
         boolean canReturn = false;
         if (user != null && book != null && book.getIssuedToEmail() != null) {
-            canReturn = book.getIssuedToEmail().equalsIgnoreCase(user.getEmail());
+            if (book.getIssuedToEmail().equalsIgnoreCase(user.getEmail())) {
+                canReturn = true;
+            }
         }
         model.put("canReturn", canReturn);
 

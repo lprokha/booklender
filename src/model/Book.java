@@ -8,6 +8,10 @@ public class Book {
     private String issuedToName;
     private boolean status;
 
+    private String issuedToEmail;
+
+
+
     public Book() {
     }
 
@@ -38,5 +42,25 @@ public class Book {
 
     public String getIssuedToName() {
         return issuedToName;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public String getIssuedToEmail() {
+        return issuedToEmail;
+    }
+
+    public void setIssuedToName(String issuedToName) {
+        this.issuedToName = issuedToName;
+    }
+
+    public void setIssuedToEmail(String issuedToEmail) {
+        this.issuedToEmail = issuedToEmail;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

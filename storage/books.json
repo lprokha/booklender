@@ -4,15 +4,16 @@
     "title": "Clean Code",
     "author": "Robert C. Martin",
     "imagePath": "/img/clean-code.jpg",
-    "status": false
+    "issuedToName": "Лейла Прохивская",
+    "status": true,
+    "issuedToEmail": "qwe@qwe.qwe"
   },
   {
     "id": 2,
     "title": "Effective Java",
     "author": "Joshua Bloch",
     "imagePath": "/img/java.jpg",
-    "issuedToName": "Айбек Ибраимов",
-    "status": true
+    "status": false
   },
   {
     "id": 3,
@@ -26,7 +27,6 @@
     "title": "Refactoring",
     "author": "Martin Fowler",
     "imagePath": "/img/refactoring.jpg",
-    "issuedToName": "Лейла",
-    "status": true
+    "status": false
   }
 ]

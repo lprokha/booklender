@@ -103,7 +103,7 @@
                   </#if>
                 </div>
 
-                <a href="/book" class="stretched-link"></a>
+                <a href="/book?id=${book.id}" class="stretched-link"></a>
               </div>
             </div>
           </#list>

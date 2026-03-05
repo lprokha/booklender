@@ -58,6 +58,8 @@ public class BooklenderServer extends BasicServer {
         registerPost("/book/return", this::returnBookPost);
         
         registerPost("/logout", this::logoutPost);
+
+
     }
 
     private void logoutPost(HttpExchange exchange) {
@@ -75,6 +77,23 @@ public class BooklenderServer extends BasicServer {
     }
 
     private void returnBookPost(HttpExchange exchange) {
+        String query = getQueryParams(exchange);
+        Map<String, String> params = Utils.parseUrlEncoded(query, "&");
+
+        String idStr = params.get("id");
+        if (idStr == null || idStr.isBlank()) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
         Employee employee = getCurrentEmployee(exchange);
         if (employee == null) {
             redirect303(exchange, "/login");
@@ -82,7 +101,15 @@ public class BooklenderServer extends BasicServer {
         }
 
         List<Book> books = bookStorage.getBooks();
-        Book book = firstBookOrNull(books);
+
+        Book book = null;
+        for (Book b : books) {
+            if (b.getId() == id) {
+                book = b;
+                break;
+            }
+        }
+
         if (book == null) {
             redirect303(exchange, "/books");
             return;
@@ -90,12 +117,13 @@ public class BooklenderServer extends BasicServer {
 
         if (book.getIssuedToEmail() == null ||
                 !book.getIssuedToEmail().equalsIgnoreCase(employee.getEmail())) {
-            redirect303(exchange, "/book");
+            redirect303(exchange, "/book?id=" + id);
             return;
         }
+        int bookId = book.getId();
 
         if (employee.getCurrentBooks() != null) {
-            employee.getCurrentBooks().removeIf(b -> b.getId() == book.getId());
+            employee.getCurrentBooks().removeIf(b -> b.getId() == bookId);
         }
         if (employee.getPastBooks() != null) {
             employee.getPastBooks().add(book);
@@ -117,10 +145,27 @@ public class BooklenderServer extends BasicServer {
         }
         employeeStorage.saveEmployees(employees);
 
-        redirect303(exchange, "/book");
+        redirect303(exchange, "/book?id=" + id);
     }
 
     private void issueBookPost(HttpExchange exchange) {
+        String query = getQueryParams(exchange);
+        Map<String, String> params = Utils.parseUrlEncoded(query, "&");
+
+        String idStr = params.get("id");
+        if (idStr == null || idStr.isBlank()) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
         Employee employee = getCurrentEmployee(exchange);
         if (employee == null) {
             redirect303(exchange, "/login");
@@ -133,14 +178,22 @@ public class BooklenderServer extends BasicServer {
         }
 
         List<Book> books = bookStorage.getBooks();
-        Book book = firstBookOrNull(books);
+
+        Book book = null;
+        for (Book b : books) {
+            if (b.getId() == id) {
+                book = b;
+                break;
+            }
+        }
+
         if (book == null) {
             redirect303(exchange, "/books");
             return;
         }
 
         if (book.getIssuedToEmail() != null && !book.getIssuedToEmail().isBlank()) {
-            redirect303(exchange, "/book");
+            redirect303(exchange, "/book?id=" + id);
             return;
         }
 
@@ -164,7 +217,7 @@ public class BooklenderServer extends BasicServer {
         }
         employeeStorage.saveEmployees(employees);
 
-        redirect303(exchange, "/book");
+        redirect303(exchange, "/book?id=" + id);
     }
 
     private static Configuration initFreeMarker() {
@@ -209,14 +262,6 @@ public class BooklenderServer extends BasicServer {
         if (email == null || email.isBlank()) return null;
 
         return employeeStorage.findByEmail(email);
-    }
-
-    private Book firstBookOrNull(List<Book> books) {
-        if (books.isEmpty()) {
-            return null;
-        }
-
-        return books.get(0);
     }
 
     private void registerGet(HttpExchange exchange) {
@@ -343,29 +388,50 @@ public class BooklenderServer extends BasicServer {
     }
 
     private void handleBook(HttpExchange exchange) {
+        String query = getQueryParams(exchange);
+        Map<String, String> params = Utils.parseUrlEncoded(query, "&");
+
+        String idStr = params.get("id");
+        if (idStr == null || idStr.isBlank()) {
+            redirect303(exchange, "/books");
+            return;
+        }
+
+        int id;
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException e) {
+            redirect303(exchange, "/books");
+            return;
+        }
 
         List<Book> books = bookStorage.getBooks();
-        Book book = firstBookOrNull(books);
+
+        Book book = null;
+        for (Book b : books) {
+            if (b.getId() == id) {
+                book = b;
+                break;
+            }
+        }
+
+        if (book == null) {
+            redirect303(exchange, "/books");
+            return;
+        }
 
         Map<String, Object> model = new HashMap<>();
         model.put("book", book);
 
         Employee employee = getCurrentEmployee(exchange);
-
-        if (employee != null) {
-            model.put("isAuth", true);
-        } else {
-            model.put("isAuth", false);
-        }
+        model.put("isAuth", employee != null);
 
         boolean canReturn = false;
-
-        if (employee != null && book != null && book.getIssuedToEmail() != null) {
+        if (employee != null && book.getIssuedToEmail() != null) {
             if (book.getIssuedToEmail().equalsIgnoreCase(employee.getEmail())) {
                 canReturn = true;
             }
         }
-
         model.put("canReturn", canReturn);
 
         renderTemplate(exchange, "book.ftl", model);

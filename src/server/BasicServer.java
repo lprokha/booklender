@@ -28,6 +28,14 @@ public abstract class BasicServer {
         registerCommonHandlers();
     }
 
+    protected String getQueryParams(HttpExchange exchange) {
+        String query = exchange.getRequestURI().getQuery();
+        if (query == null) {
+            return "";
+        }
+        return query;
+    }
+
     private static String makeKey(String method, String route) {
         return String.format("%s %s", method.toUpperCase(), route);
     }

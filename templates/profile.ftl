@@ -55,6 +55,7 @@
 
 <main class="bg-light">
   <div class="container-xxl py-5">
+
     <div class="d-flex align-items-center justify-content-between mb-4">
       <h1 class="fw-semibold m-0">Профиль</h1>
       <a href="/books" class="btn btn-outline-secondary">
@@ -62,10 +63,10 @@
       </a>
     </div>
 
-    <#-- Если пользователь реально авторизован -->
     <#if isReal?? && isReal>
+
       <div class="alert alert-success">
-        <i class="bi bi-check2 me-2"></i>Успешный вход
+        <i class="bi bi-check2 me-2"></i>Вы вошли в систему
       </div>
 
       <form method="post" action="/logout" class="mb-4">
@@ -74,26 +75,81 @@
         </button>
       </form>
 
-    <#-- Если страница открыта напрямую -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="mb-2">
+            <span class="text-muted">Email:</span>
+            <strong>${email}</strong>
+          </div>
+
+          <div class="mb-2">
+            <span class="text-muted">Имя:</span>
+            <strong>${fullName}</strong>
+          </div>
+
+          <div>
+            <span class="text-muted">Можно взять ещё:</span>
+            <strong>${left}</strong>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="mb-3">Текущие книги</h3>
+
+      <#if currentBooks?? && currentBooks?size gt 0>
+        <ul class="list-group mb-5">
+
+          <#list currentBooks as book>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+
+              <div>
+                <strong>${book.title}</strong><br>
+                <span class="text-muted">${book.author}</span>
+              </div>
+
+              <a href="/book?id=${book.id}" class="btn btn-sm btn-outline-primary">
+                Открыть
+              </a>
+
+            </li>
+          </#list>
+
+        </ul>
+      <#else>
+        <p class="text-muted mb-5">У вас нет взятых книг</p>
+      </#if>
+
+
+      <h3 class="mb-3">История книг</h3>
+
+      <#if pastBooks?? && pastBooks?size gt 0>
+        <ul class="list-group">
+
+          <#list pastBooks as book>
+            <li class="list-group-item">
+              <strong>${book.title}</strong>
+              <span class="text-muted">— ${book.author}</span>
+            </li>
+          </#list>
+
+        </ul>
+      <#else>
+        <p class="text-muted">Вы ещё не возвращали книги</p>
+      </#if>
+
+
     <#else>
+
       <div class="alert alert-warning">
         <i class="bi bi-info-circle me-2"></i>
-        Страница открыта напрямую. Показаны демонстрационные данные.
+        Чтобы увидеть свой профиль, необходимо войти в систему.
       </div>
-    </#if>
 
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-4">
-        <div class="mb-2">
-          <span class="text-muted">Email:</span>
-          <strong>${email}</strong>
-        </div>
-        <div>
-          <span class="text-muted">Имя:</span>
-          <strong>${fullName}</strong>
-        </div>
-      </div>
-    </div>
+      <a href="/login" class="btn btn-primary">
+        Перейти к входу
+      </a>
+
+    </#if>
 
   </div>
 </main>

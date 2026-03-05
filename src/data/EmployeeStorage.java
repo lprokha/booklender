@@ -46,4 +46,16 @@ public class EmployeeStorage {
         }
         return max + 1;
     }
+
+    public Employee authenticate(String email, String password) {
+        List<Employee> employees = getEmployees();
+
+        for (Employee e : employees) {
+            if (e.getEmail() != null && e.getEmail().equalsIgnoreCase(email) && e.getPassword() != null && e.getPassword().equals(password)) {
+                return e;
+            }
+         }
+
+        return null;
+    }
 }

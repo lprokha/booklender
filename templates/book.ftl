@@ -54,6 +54,9 @@
                 <a class="nav-link active" href="/employee">Сотрудник</a>
               </li>
               <li class="nav-item mx-lg-3">
+                <a class="nav-link active" href="/employees">Сотрудники</a>
+              </li>
+              <li class="nav-item mx-lg-3">
                 <a class="nav-link active" href="/register">Регистрация</a>
               </li>
               <li class="nav-item mx-lg-3">
@@ -98,7 +101,7 @@
 
                   <#-- Кнопка "Вернуть" только если это моя книга -->
                   <#if canReturn?? && canReturn>
-                    <form method="post" action="/book/return" class="mt-3">
+                    <form method="post" action="/book/return?id=${book.id}" class="mt-3">
                       <button type="submit" class="btn btn-outline-danger">
                         <i class="bi bi-arrow-counterclockwise me-2"></i>Вернуть книгу
                       </button>
@@ -114,7 +117,7 @@
 
                   <#-- Взять книгу можно только после авторизации -->
                   <#if isAuth?? && isAuth>
-                    <form method="post" action="/book/issue" class="mt-3">
+                    <form method="post" action="/book/issue?id=${book.id}" class="mt-3">
                       <button type="submit" class="btn btn-success">
                         <i class="bi bi-bookmark-plus me-2"></i>Взять книгу
                       </button>

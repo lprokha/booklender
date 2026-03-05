@@ -4,29 +4,33 @@
     "title": "Clean Code",
     "author": "Robert C. Martin",
     "imagePath": "/img/clean-code.jpg",
-    "status": false
+    "issuedToName": "Лейла Прохивская",
+    "status": true,
+    "issuedToEmail": "qwe@qwe.qwe"
   },
   {
     "id": 2,
     "title": "Effective Java",
     "author": "Joshua Bloch",
     "imagePath": "/img/java.jpg",
-    "issuedToName": "Айбек Ибраимов",
-    "status": true
+    "issuedToName": "Лейла Прохивская",
+    "status": true,
+    "issuedToEmail": "qwe@qwe.qwe"
   },
   {
     "id": 3,
     "title": "Design Patterns",
     "author": "GoF",
     "imagePath": "/img/patterns.jpg",
-    "status": false
+    "issuedToName": "Иван Иванов",
+    "status": true,
+    "issuedToEmail": "asd@asd.asd"
   },
   {
     "id": 4,
     "title": "Refactoring",
     "author": "Martin Fowler",
     "imagePath": "/img/refactoring.jpg",
-    "issuedToName": "Лейла",
-    "status": true
+    "status": false
   }
 ]

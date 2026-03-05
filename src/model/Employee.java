@@ -8,16 +8,18 @@ public class Employee {
     private List<Book> currentBooks;
     private List<Book> pastBooks;
     private String email;
+    private String password;
 
     public Employee() {
     }
 
-    public Employee(int id, String fullName, List<Book> currentBooks, List<Book> pastBooks, String email) {
+    public Employee(int id, String fullName, List<Book> currentBooks, List<Book> pastBooks, String email, String password) {
         this.id = id;
         this.fullName = fullName;
         this.currentBooks = currentBooks;
         this.pastBooks = pastBooks;
         this.email = email;
+        this.password = password;
     }
 
     public int getId() {
@@ -38,5 +40,9 @@ public class Employee {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

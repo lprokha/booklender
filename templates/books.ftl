@@ -54,6 +54,9 @@
                 <a class="nav-link active" href="/employee">Сотрудник</a>
               </li>
               <li class="nav-item mx-lg-3">
+                <a class="nav-link active" href="/employees">Сотрудники</a>
+              </li>
+              <li class="nav-item mx-lg-3">
                 <a class="nav-link active" href="/register">Регистрация</a>
               </li>
               <li class="nav-item mx-lg-3">
@@ -103,7 +106,7 @@
                   </#if>
                 </div>
 
-                <a href="/book" class="stretched-link"></a>
+                <a href="/book?id=${book.id}" class="stretched-link"></a>
               </div>
             </div>
           </#list>

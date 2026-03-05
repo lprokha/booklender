@@ -1,38 +1,55 @@
 [
   {
     "id": 1,
-    "fullName": "Иван Иванов",
-    "currentBooks": [],
-    "pastBooks": [],
-    "email": "ivan@example.com"
-  },
-  {
-    "id": 2,
-    "fullName": "Лейла",
-    "currentBooks": [],
+    "fullName": "Лейла Прохивская",
+    "currentBooks": [
+      {
+        "id": 1,
+        "title": "Clean Code",
+        "author": "Robert C. Martin",
+        "imagePath": "/img/clean-code.jpg",
+        "issuedToName": "Лейла Прохивская",
+        "status": true,
+        "issuedToEmail": "qwe@qwe.qwe"
+      },
+      {
+        "id": 2,
+        "title": "Effective Java",
+        "author": "Joshua Bloch",
+        "imagePath": "/img/java.jpg",
+        "issuedToName": "Лейла Прохивская",
+        "status": true,
+        "issuedToEmail": "qwe@qwe.qwe"
+      }
+    ],
     "pastBooks": [
       {
-        "id": 1,
-        "title": "Clean Code",
-        "author": "Robert C. Martin",
-        "imagePath": "/img/clean-code.jpg",
-        "status": false
-      },
-      {
-        "id": 1,
-        "title": "Clean Code",
-        "author": "Robert C. Martin",
-        "imagePath": "/img/clean-code.jpg",
-        "status": false
-      },
-      {
-        "id": 1,
-        "title": "Clean Code",
-        "author": "Robert C. Martin",
-        "imagePath": "/img/clean-code.jpg",
+        "id": 2,
+        "title": "Effective Java",
+        "author": "Joshua Bloch",
+        "imagePath": "/img/java.jpg",
         "status": false
       }
     ],
-    "email": "qwe@qwe.qwe"
+    "email": "qwe@qwe.qwe",
+    "password": "qweqwe123"
+  },
+  {
+    "id": 2,
+    "fullName": "Иван Иванов",
+    "currentBooks": [
+      {
+        "id": 3,
+        "title": "Design Patterns",
+        "author": "GoF",
+        "imagePath": "/img/patterns.jpg",
+        "issuedToName": "Иван Иванов",
+        "status": true,
+        "issuedToEmail": "asd@asd.asd"
+      }
+    ],
+    "pastBooks": [],
+    "email": "asd@asd.asd",
+    "password": "asdasd123"
   }
 ]

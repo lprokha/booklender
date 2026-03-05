@@ -59,7 +59,18 @@ public class BooklenderServer extends BasicServer {
         
         registerPost("/logout", this::logoutPost);
 
+        registerGet("/employees", this::handleEmployees);
 
+    }
+
+    private void handleEmployees(HttpExchange exchange) {
+
+        List<Employee> employees = employeeStorage.getEmployees();
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("employees", employees);
+
+        renderTemplate(exchange, "employees.ftl", model);
     }
 
     private void logoutPost(HttpExchange exchange) {
@@ -438,8 +449,13 @@ public class BooklenderServer extends BasicServer {
     }
 
     private void handleEmployee(HttpExchange exchange) {
-        List<Employee> employees = employeeStorage.getEmployees();
-        Employee employee = employees.isEmpty() ? null : employees.get(0);
+
+        Employee employee = getCurrentEmployee(exchange);
+
+        if (employee == null) {
+            redirect303(exchange, "/login");
+            return;
+        }
 
         Map<String, Object> model = new HashMap<>();
         model.put("employee", employee);

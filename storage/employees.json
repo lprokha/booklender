@@ -11,6 +11,15 @@
         "issuedToName": "Лейла Прохивская",
         "status": true,
         "issuedToEmail": "qwe@qwe.qwe"
+      },
+      {
+        "id": 2,
+        "title": "Effective Java",
+        "author": "Joshua Bloch",
+        "imagePath": "/img/java.jpg",
+        "issuedToName": "Лейла Прохивская",
+        "status": true,
+        "issuedToEmail": "qwe@qwe.qwe"
       }
     ],
     "pastBooks": [
@@ -24,5 +33,23 @@
     ],
     "email": "qwe@qwe.qwe",
     "password": "qweqwe123"
+  },
+  {
+    "id": 2,
+    "fullName": "Иван Иванов",
+    "currentBooks": [
+      {
+        "id": 3,
+        "title": "Design Patterns",
+        "author": "GoF",
+        "imagePath": "/img/patterns.jpg",
+        "issuedToName": "Иван Иванов",
+        "status": true,
+        "issuedToEmail": "asd@asd.asd"
+      }
+    ],
+    "pastBooks": [],
+    "email": "asd@asd.asd",
+    "password": "asdasd123"
   }
 ]
